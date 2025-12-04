@@ -5,6 +5,7 @@ import ca.carleton.niklegault.justInvest.problem1.Actions;
 import ca.carleton.niklegault.justInvest.problem1.Roles;
 import ca.carleton.niklegault.justInvest.problem1.User;
 import ca.carleton.niklegault.justInvest.problem3.SignUp;
+import ca.carleton.niklegault.justInvest.problem4.LogIn;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -20,12 +21,14 @@ public class Application {
     private static User user; // The user accessing the system
     private static AccessControl accessControl; // Access Control mechanism
     private static SignUp signUp; // Sign up functionality
+    private static LogIn logIn; // Log in functionality
 
     public static void main(String[] args) {
         running = true;
         loggedIn = false;
         accessControl = new AccessControl();
         signUp = new SignUp();
+        logIn = new LogIn();
         user = null;
         while(running) {
             printOptions();
@@ -56,6 +59,7 @@ public class Application {
     private static void takeInput() {
         Scanner scanner = new Scanner(System.in);
         String input = scanner.next();
+        Console console = System.console();
 
         switch (input) {
             case "1":
@@ -141,7 +145,6 @@ public class Application {
                 System.out.print("Username (case sensitive): ");
                 String username = scanner.next();
 
-                Console console = System.console();
                 System.out.print("Password (case sensitive): ");
                 char[] passwordChars;
                 if(console == null) {
@@ -173,7 +176,35 @@ public class Application {
                 break;
             case "L":
             case "l":
-                // @TODO Problem 4, log in users
+                System.out.print("Username (case sensitive): ");
+                String loginUsername = scanner.next();
+
+                System.out.print("Password (case sensitive): ");
+                char[] loginPasswordChars;
+                if(console == null) {
+                    loginPasswordChars = scanner.next().toCharArray();
+                } else {
+                    loginPasswordChars = console.readPassword();
+                }
+
+                String loginPassword;
+                if(loginPasswordChars != null) {
+                    loginPassword = new String(loginPasswordChars);
+                    Arrays.fill(loginPasswordChars, ' ');
+                } else {
+                    System.out.println("Please try again\n");
+                    break;
+                }
+                user = logIn.logIn(loginUsername, loginPassword);
+
+                if(user == null) {
+                    System.out.println("Error logging in, try again\n");
+                    break;
+                }
+                loggedIn = true;
+
+                System.out.println("Log in successful, role: " + user.getRole() + "\n");
+
                 break;
             case "E":
             case "e":

@@ -59,8 +59,13 @@ public class SignUp {
     }
 
     public boolean register(String password, User user) {
+        String filename = "passwd.txt";
+        return register(password, user, filename);
+    }
+
+    public boolean register(String password, User user, String filename) {
         if(validPassword(password, user.getName())) {
-            return this.passwordHashing.storePassword(password, user);
+            return this.passwordHashing.storePassword(password, user, filename);
         } else {
             return false;
         }
