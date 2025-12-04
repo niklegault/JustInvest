@@ -14,15 +14,20 @@ import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The sign up/register mechanism of the JustInvest system.
+ * @author Nik Legault 101229919
+ */
 public class SignUp {
-    private String commonPasswords;
-    private PasswordHashing passwordHashing;
+    private final String commonPasswords;
+    private final PasswordHashing passwordHashing;
 
     public SignUp() {
         this.commonPasswords = readCommonPasswords();
         this.passwordHashing = new PasswordHashing();
     }
 
+    // Check if password meets requirements
     protected boolean validPassword(String password, String username) {
         final String PASSWORD_REGEX = "(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%*&])";
         Pattern regex = Pattern.compile(PASSWORD_REGEX);
@@ -43,6 +48,7 @@ public class SignUp {
         return true;
     }
 
+    // Read list of common passwords
     private String readCommonPasswords() {
         String fileName = "CommonPasswords.txt";
 

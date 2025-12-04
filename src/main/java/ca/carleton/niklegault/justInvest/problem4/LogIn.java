@@ -4,8 +4,12 @@ import ca.carleton.niklegault.justInvest.problem1.Roles;
 import ca.carleton.niklegault.justInvest.problem1.User;
 import ca.carleton.niklegault.justInvest.problem2.PasswordHashing;
 
+/**
+ * The log in mechanism for the JustInvest System
+ * @author Nik Legault 101229919
+ */
 public class LogIn {
-    private PasswordHashing passwordHashing;
+    private final PasswordHashing passwordHashing;
 
     public LogIn() {
         this.passwordHashing = new PasswordHashing();
