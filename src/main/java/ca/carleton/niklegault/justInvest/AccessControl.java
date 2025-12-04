@@ -1,25 +1,29 @@
 package ca.carleton.niklegault.justInvest;
 
 import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalTime;
-import java.time.ZoneId;
+import java.util.Calendar;
+
 
 public class AccessControl {
 
     private final Clock clock;
+    private final Calendar cal;
 
     public AccessControl() {
+        this.cal = Calendar.getInstance();
         this.clock = Clock.systemDefaultZone();
     }
 
-    public AccessControl(Clock clock) {
+    public AccessControl(Clock clock, Calendar cal) {
         this.clock = clock;
+        this.cal = cal;
     }
 
     public boolean hasAccess(User user, Actions action) {
         Roles userRole = user.getRole();
-        if(userRole == Roles.TELLER && (LocalTime.now(clock).getHour() < 9 || LocalTime.now(clock).getHour() >= 17)) {
+        if(userRole == Roles.TELLER && (LocalTime.now(clock).getHour() < 9 || LocalTime.now(clock).getHour() >= 17 ||
+                cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
             return false;
         }
         switch(action) {

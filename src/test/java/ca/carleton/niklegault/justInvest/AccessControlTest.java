@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Calendar;
 
 
 class AccessControlTest {
@@ -41,10 +42,12 @@ class AccessControlTest {
     }
 
     @Test
-    public void testTellerAccessDuringBusinessHours() {
+    public void testTellerAccessDuringBusinessHoursAndBusinessDay() {
         Instant fixedTime = Instant.parse("2023-11-14T10:00:00Z");
         Clock fixedClock = Clock.fixed(fixedTime, ZoneId.of("UTC"));
-        AccessControl accessControl = new AccessControl(fixedClock);
+        Calendar fixedCal = Calendar.getInstance();
+        fixedCal.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+        AccessControl accessControl = new AccessControl(fixedClock, fixedCal);
 
         User teller = new User(Roles.TELLER, "test");
 
@@ -59,10 +62,52 @@ class AccessControlTest {
     }
 
     @Test
-    public void testTellerAccessAfterBusinessHours() {
+    public void testTellerAccessAfterBusinessHoursAndBusinessDay() {
         Instant fixedTime = Instant.parse("2023-11-14T20:00:00Z");
         Clock fixedClock = Clock.fixed(fixedTime, ZoneId.of("UTC"));
-        AccessControl accessControl = new AccessControl(fixedClock);
+        Calendar fixedCal = Calendar.getInstance();
+        fixedCal.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+        AccessControl accessControl = new AccessControl(fixedClock, fixedCal);
+
+        User teller = new User(Roles.TELLER, "test");
+
+        // Test teller access
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_ACCOUNT_BALANCE));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_INVESTMENT_PORTFOLIO));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_FINANCIAL_ADVISOR_INFO));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_FINANCIAL_PLANNER_INFO));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_MONEY_MARKET_INSTRUMENTS));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_PRIVATE_CONSUMER_INSTRUMENTS));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.MODIFY_INVESTMENT_PORTFOLIO));
+    }
+
+    @Test
+    public void testTellerAccessDuringBusinessHoursNotBusinessDay() {
+        Instant fixedTime = Instant.parse("2023-11-14T10:00:00Z");
+        Clock fixedClock = Clock.fixed(fixedTime, ZoneId.of("UTC"));
+        Calendar fixedCal = Calendar.getInstance();
+        fixedCal.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        AccessControl accessControl = new AccessControl(fixedClock, fixedCal);
+
+        User teller = new User(Roles.TELLER, "test");
+
+        // Test teller access
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_ACCOUNT_BALANCE));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_INVESTMENT_PORTFOLIO));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_FINANCIAL_ADVISOR_INFO));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_FINANCIAL_PLANNER_INFO));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_MONEY_MARKET_INSTRUMENTS));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.VIEW_PRIVATE_CONSUMER_INSTRUMENTS));
+        Assertions.assertFalse(accessControl.hasAccess(teller, Actions.MODIFY_INVESTMENT_PORTFOLIO));
+    }
+
+    @Test
+    public void testTellerAccessAfterBusinessHoursNotBusinessDay() {
+        Instant fixedTime = Instant.parse("2023-11-14T20:00:00Z");
+        Clock fixedClock = Clock.fixed(fixedTime, ZoneId.of("UTC"));
+        Calendar fixedCal = Calendar.getInstance();
+        fixedCal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        AccessControl accessControl = new AccessControl(fixedClock, fixedCal);
 
         User teller = new User(Roles.TELLER, "test");
 
