@@ -32,7 +32,7 @@ public class PasswordHashing {
     }
 
     // Stores the password in a specific password file
-    protected boolean storePassword(String rawPassword, User user, String filename) {
+    public boolean storePassword(String rawPassword, User user, String filename) {
         String userRow = user.getName() + ":" + hashPassword(rawPassword) + ":" + user.getRole().toString() + "\n";
 
         try {

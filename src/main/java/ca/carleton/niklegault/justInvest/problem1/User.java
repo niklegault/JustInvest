@@ -1,5 +1,7 @@
 package ca.carleton.niklegault.justInvest.problem1;
 
+import java.util.Objects;
+
 /**
  * A user of the JustInvest System
  * @author Nik Legault 101229919
@@ -27,5 +29,17 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return role == user.role && Objects.equals(name, user.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(role, name);
     }
 }

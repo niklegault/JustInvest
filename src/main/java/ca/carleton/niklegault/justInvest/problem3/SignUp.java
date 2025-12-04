@@ -14,15 +14,20 @@ import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The sign up/register mechanism of the JustInvest system.
+ * @author Nik Legault 101229919
+ */
 public class SignUp {
-    private String commonPasswords;
-    private PasswordHashing passwordHashing;
+    private final String commonPasswords;
+    private final PasswordHashing passwordHashing;
 
     public SignUp() {
         this.commonPasswords = readCommonPasswords();
         this.passwordHashing = new PasswordHashing();
     }
 
+    // Check if password meets requirements
     protected boolean validPassword(String password, String username) {
         final String PASSWORD_REGEX = "(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%*&])";
         Pattern regex = Pattern.compile(PASSWORD_REGEX);
@@ -35,7 +40,7 @@ public class SignUp {
 
         password = password.toLowerCase();
         username = username.toLowerCase();
-        if (password.length() < 8 || password.length() > 12 || password.equals(username) || commonPasswords.contains(password)) {
+        if (password.length() < 8 || password.length() > 12 || password.equals(username) || this.commonPasswords.contains(password)) {
             System.out.println("Invalid password parameters.");
             return false;
         }
@@ -43,24 +48,30 @@ public class SignUp {
         return true;
     }
 
+    // Read list of common passwords
     private String readCommonPasswords() {
         String fileName = "CommonPasswords.txt";
 
-        ClassLoader classLoader = getClass().getClassLoader();
-        try {
-            URI uri = classLoader.getResource(fileName).toURI();
-            Path path = Path.of(uri);
-            return Files.readString(path, StandardCharsets.UTF_8);
-        } catch (Exception e) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+            if (inputStream == null) {
+                System.out.println("Error: CommonPasswords.txt not found in resources.");
+                return null;
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
             System.out.println("Error loading common password list: " + e);
             return null;
         }
-
     }
 
     public boolean register(String password, User user) {
+        String filename = "passwd.txt";
+        return register(password, user, filename);
+    }
+
+    public boolean register(String password, User user, String filename) {
         if(validPassword(password, user.getName())) {
-            return this.passwordHashing.storePassword(password, user);
+            return this.passwordHashing.storePassword(password, user, filename);
         } else {
             return false;
         }

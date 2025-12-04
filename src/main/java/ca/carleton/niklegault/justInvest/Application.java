@@ -5,6 +5,7 @@ import ca.carleton.niklegault.justInvest.problem1.Actions;
 import ca.carleton.niklegault.justInvest.problem1.Roles;
 import ca.carleton.niklegault.justInvest.problem1.User;
 import ca.carleton.niklegault.justInvest.problem3.SignUp;
+import ca.carleton.niklegault.justInvest.problem4.LogIn;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -20,12 +21,14 @@ public class Application {
     private static User user; // The user accessing the system
     private static AccessControl accessControl; // Access Control mechanism
     private static SignUp signUp; // Sign up functionality
+    private static LogIn logIn; // Log in functionality
 
     public static void main(String[] args) {
         running = true;
         loggedIn = false;
         accessControl = new AccessControl();
         signUp = new SignUp();
+        logIn = new LogIn();
         user = null;
         while(running) {
             printOptions();
@@ -34,6 +37,7 @@ public class Application {
 
     }
 
+    // Show available options
     private static void printOptions() {
         System.out.println("justInvest System");
         System.out.println("----------------------------------------");
@@ -48,6 +52,8 @@ public class Application {
         if(!loggedIn) {
             System.out.println("(S)ign up");
             System.out.println("(L)og in");
+        } else {
+            System.out.println("(Lo)g out");
         }
         System.out.println("(E)xit\n");
         System.out.print("> ");
@@ -56,9 +62,10 @@ public class Application {
     private static void takeInput() {
         Scanner scanner = new Scanner(System.in);
         String input = scanner.next();
+        Console console = System.console();
 
         switch (input) {
-            case "1":
+            case "1": // View account balance
                 if(loggedIn && accessControl.hasAccess(user, Actions.VIEW_ACCOUNT_BALANCE)) {
                     System.out.println("Successfully viewed account balance\n");
                 } else if (!loggedIn) {
@@ -67,7 +74,7 @@ public class Application {
                     System.out.println("Access denied\n");
                 }
                 break;
-            case "2":
+            case "2": // View investment portfolio
                 if(loggedIn && accessControl.hasAccess(user, Actions.VIEW_INVESTMENT_PORTFOLIO)) {
                     System.out.println("Successfully viewed investment portfolio\n");
                 } else if (!loggedIn) {
@@ -76,7 +83,7 @@ public class Application {
                     System.out.println("Access denied\n");
                 }
                 break;
-            case "3":
+            case "3": // Modify investment portfolio
                 if(loggedIn && accessControl.hasAccess(user, Actions.MODIFY_INVESTMENT_PORTFOLIO)) {
                     System.out.println("Successfully modified investment portfolio\n");
                 } else if (!loggedIn) {
@@ -85,7 +92,7 @@ public class Application {
                     System.out.println("Access denied\n");
                 }
                 break;
-            case "4":
+            case "4": // View advisor info
                 if(loggedIn && accessControl.hasAccess(user, Actions.VIEW_FINANCIAL_ADVISOR_INFO)) {
                     System.out.println("Successfully viewed Financial Advisor Info\n");
                 } else if (!loggedIn) {
@@ -94,7 +101,7 @@ public class Application {
                     System.out.println("Access denied\n");
                 }
                 break;
-            case "5":
+            case "5": // View planner info
                 if(loggedIn && accessControl.hasAccess(user, Actions.VIEW_FINANCIAL_PLANNER_INFO)) {
                     System.out.println("Successfully viewed Financial Planner Info\n");
                 } else if (!loggedIn) {
@@ -103,7 +110,7 @@ public class Application {
                     System.out.println("Access denied\n");
                 }
                 break;
-            case "6":
+            case "6": // View money market instruments
                 if(loggedIn && accessControl.hasAccess(user, Actions.VIEW_MONEY_MARKET_INSTRUMENTS)) {
                     System.out.println("Successfully viewed Money Market Instruments\n");
                 } else if (!loggedIn) {
@@ -112,7 +119,7 @@ public class Application {
                     System.out.println("Access denied\n");
                 }
                 break;
-            case "7":
+            case "7": // View private consumer instruments
                 if(loggedIn && accessControl.hasAccess(user, Actions.VIEW_PRIVATE_CONSUMER_INSTRUMENTS)) {
                     System.out.println("Successfully viewed Private Consumer Instruments\n");
                 } else if (!loggedIn) {
@@ -121,7 +128,7 @@ public class Application {
                     System.out.println("Access denied\n");
                 }
                 break;
-            case "S":
+            case "S": // Sign up
             case "s":
                 System.out.println("Password Requirements:");
                 System.out.println("------------------------------------");
@@ -141,7 +148,6 @@ public class Application {
                 System.out.print("Username (case sensitive): ");
                 String username = scanner.next();
 
-                Console console = System.console();
                 System.out.print("Password (case sensitive): ");
                 char[] passwordChars;
                 if(console == null) {
@@ -171,11 +177,47 @@ public class Application {
                 user = null;
                 System.out.println("Sign up unsuccessful");
                 break;
-            case "L":
+            case "L": // Log in
             case "l":
-                // @TODO Problem 4, log in users
+                System.out.print("Username (case sensitive): ");
+                String loginUsername = scanner.next();
+
+                System.out.print("Password (case sensitive): ");
+                char[] loginPasswordChars;
+                if(console == null) {
+                    loginPasswordChars = scanner.next().toCharArray();
+                } else {
+                    loginPasswordChars = console.readPassword();
+                }
+
+                String loginPassword;
+                if(loginPasswordChars != null) {
+                    loginPassword = new String(loginPasswordChars);
+                    Arrays.fill(loginPasswordChars, ' ');
+                } else {
+                    System.out.println("Please try again\n");
+                    break;
+                }
+                user = logIn.logIn(loginUsername, loginPassword);
+
+                if(user == null) {
+                    System.out.println("Error logging in, try again\n");
+                    break;
+                }
+                loggedIn = true;
+
+                System.out.println("Log in successful, role: " + user.getRole() + "\n");
+
                 break;
-            case "E":
+            case "LO": // Log out
+            case "Lo":
+            case "lo":
+            case "lO":
+                user = null;
+                loggedIn = false;
+                System.out.println("Log out successful\n");
+                break;
+            case "E": // Exit
             case "e":
                 System.out.println("Exiting system...\n");
                 running = false;
