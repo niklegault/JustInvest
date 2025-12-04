@@ -23,7 +23,7 @@ public class SignUp {
         this.passwordHashing = new PasswordHashing();
     }
 
-    private boolean validPassword(String password, String username) {
+    protected boolean validPassword(String password, String username) {
         final String PASSWORD_REGEX = "(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%*&])";
         Pattern regex = Pattern.compile(PASSWORD_REGEX);
         Matcher matcher = regex.matcher(password);
@@ -60,9 +60,10 @@ public class SignUp {
 
     public boolean register(String password, User user) {
         if(validPassword(password, user.getName())) {
-            return passwordHashing.storePassword(password, user);
+            return this.passwordHashing.storePassword(password, user);
         } else {
             return false;
         }
     }
+
 }
